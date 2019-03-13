@@ -20,6 +20,7 @@
     "rollup-plugin-babel": "^3.0.7"
   },
   "dependencies": {
-    "auraria-ecs": "github:k9rosie/auraria-ecs#master"
+    "auraria-ecs": "github:k9rosie/auraria-ecs#master",
+    "socket.io": "^2.2.0"
   }
 }
