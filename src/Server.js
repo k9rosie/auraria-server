@@ -4,13 +4,13 @@ import {createServer} from "http";
 import socketio from "socket.io";
 
 export default class Server {
-    constructor(opts = {}) {
-        let defaults = {
+    constructor(opts) {
+        let options = {
             ip: '127.0.0.1',
-            port: '8080',
-            assetsDir: path.join(__dirname, '/assets')
+            port: 8080,
+            assetsDir: path.join(__dirname, '/assets'),
+            ...opts
         };
-        let options = Object.assign({}, defaults, opts);
 
         this.ip = options.ip;
         this.port = options.port;

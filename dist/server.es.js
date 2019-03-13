@@ -13,6 +13,20 @@ var classCallCheck = function (instance, Constructor) {
   }
 };
 
+var _extends = Object.assign || function (target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = arguments[i];
+
+    for (var key in source) {
+      if (Object.prototype.hasOwnProperty.call(source, key)) {
+        target[key] = source[key];
+      }
+    }
+  }
+
+  return target;
+};
+
 var Tilesheet = function () {
     function Tilesheet(img, data) {
         classCallCheck(this, Tilesheet);
@@ -80,16 +94,14 @@ var Assets = function () {
 }();
 
 var Server = function () {
-    function Server() {
-        var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    function Server(opts) {
         classCallCheck(this, Server);
 
-        var defaults$$1 = {
+        var options = _extends({
             ip: '127.0.0.1',
-            port: '8080',
+            port: 8080,
             assetsDir: path.join(__dirname, '/assets')
-        };
-        var options = Object.assign({}, defaults$$1, opts);
+        }, opts);
 
         this.ip = options.ip;
         this.port = options.port;
