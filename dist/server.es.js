@@ -34,7 +34,7 @@ var Assets = function () {
             maps: path.join(assetsDir, '/maps'),
             tilesheets: {
                 img: path.join(assetsDir, '/tilesheets/img'),
-                json: fs.readdirSync(assetsDir + '/tilesheets/json')
+                json: path.join(assetsDir, '/tilesheets/json')
             }
         };
         this.maps = {};
