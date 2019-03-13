@@ -80,12 +80,21 @@ var Assets = function () {
 }();
 
 var Server = function () {
-    function Server(opts) {
+    function Server() {
+        var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
         classCallCheck(this, Server);
 
-        this.ip = opts !== undefined ? opts.ip : '127.0.0.1';
-        this.port = opts !== undefined ? opts.port : '8080';
-        this.assetDir = opts !== undefined ? opts.assetsDir : path.join(__dirname, '/assets');
+        var defaults$$1 = {
+            ip: '127.0.0.1',
+            port: '8080',
+            assetsDir: path.join(__dirname, '/assets')
+        };
+        var options = Object.assign({}, defaults$$1, opts);
+
+        this.ip = options.ip;
+        this.port = options.port;
+        this.assetDir = options.assetDir;
+
         this.assets = new Assets(this.assetDir);
         this.http = createServer();
         this.socket = socketio(this.http);

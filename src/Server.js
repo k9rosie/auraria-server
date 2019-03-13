@@ -4,10 +4,18 @@ import {createServer} from "http";
 import socketio from "socket.io";
 
 export default class Server {
-    constructor(opts) {
-        this.ip = (opts !== undefined)? opts.ip : '127.0.0.1';
-        this.port = (opts !== undefined)? opts.port : '8080';
-        this.assetDir = (opts !== undefined)? opts.assetsDir : path.join(__dirname, '/assets');
+    constructor(opts = {}) {
+        let defaults = {
+            ip: '127.0.0.1',
+            port: '8080',
+            assetsDir: path.join(__dirname, '/assets')
+        };
+        let options = Object.assign({}, defaults, opts);
+
+        this.ip = options.ip;
+        this.port = options.port;
+        this.assetDir = options.assetDir;
+
         this.assets = new Assets(this.assetDir);
         this.http = createServer();
         this.socket = socketio(this.http);
