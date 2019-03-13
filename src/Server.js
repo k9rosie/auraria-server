@@ -20,7 +20,8 @@ export default class Server {
 
     init() {
         this.loadAssets();
-        this.http.listen(this.ip, this.port)
+        console.log(this.assets.maps);
+        this.http.listen(this.ip, this.port);
         console.log(`listening on ${this.ip}:${this.port}`);
     }
 }

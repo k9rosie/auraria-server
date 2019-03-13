@@ -102,6 +102,7 @@ var Server = function () {
 
     Server.prototype.init = function init() {
         this.loadAssets();
+        console.log(this.assets.maps);
         this.http.listen(this.ip, this.port);
         console.log("listening on " + this.ip + ":" + this.port);
     };
