@@ -18,8 +18,8 @@ export default class Assets {
 
     loadMaps() {
         fs.readdirSync(this.dirs.maps).forEach(fileName => {
-            let path = path.join(this.dirs.maps, fileName);
-            this.maps[fileName] = Assets.map(path);
+            let p = path.join(this.dirs.maps, fileName);
+            this.maps[fileName] = Assets.map(p);
         });
     }
 

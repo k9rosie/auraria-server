@@ -45,8 +45,8 @@ var Assets = function () {
         var _this = this;
 
         fs.readdirSync(this.dirs.maps).forEach(function (fileName) {
-            var path$$1 = path$$1.join(_this.dirs.maps, fileName);
-            _this.maps[fileName] = Assets.map(path$$1);
+            var p = path.join(_this.dirs.maps, fileName);
+            _this.maps[fileName] = Assets.map(p);
         });
     };
 
