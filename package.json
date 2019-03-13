@@ -1,0 +1,25 @@
+{
+  "name": "auraria-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/server.js",
+  "module": "dist/server.es.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rollup -c"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "rollup": "^0.63.5",
+    "rollup-plugin-babel": "^3.0.7"
+  },
+  "dependencies": {
+    "auraria-ecs": "github:k9rosie/auraria-ecs#master"
+  }
+}
