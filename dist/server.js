@@ -18,7 +18,7 @@ var classCallCheck = function (instance, Constructor) {
 };
 
 var Tilesheet = function () {
-    function Tilesheet(image, data) {
+    function Tilesheet(img, data) {
         classCallCheck(this, Tilesheet);
 
         this.img = img; // image data in uncompressed base64 format

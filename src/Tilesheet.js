@@ -1,5 +1,5 @@
 export default class Tilesheet {
-    constructor(image, data) {
+    constructor(img, data) {
         this.img = img; // image data in uncompressed base64 format
         this.data = data;
     }
