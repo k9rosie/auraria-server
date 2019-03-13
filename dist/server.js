@@ -123,7 +123,7 @@ var Server = function () {
 
     Server.prototype.init = function init() {
         this.loadAssets();
-        this.http.listen(this.ip, this.port);
+        this.http.listen(this.port, this.ip);
         console.log("listening on " + this.ip + ":" + this.port);
     };
 
