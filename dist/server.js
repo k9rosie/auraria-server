@@ -87,9 +87,9 @@ var Server = function () {
     function Server(opts) {
         classCallCheck(this, Server);
 
-        this.ip = opts.ip || '127.0.0.1';
-        this.port = opts.port || '8080';
-        this.assetDir = opts.assetDir || path.join(__dirname, '/assets');
+        this.ip = opts ? opts.ip : '127.0.0.1';
+        this.port = opts ? opts.port : '8080';
+        this.assetDir = opts ? opts.assetsDir : path.join(__dirname, '/assets');
         this.assets = new Assets(this.assetDir);
         this.http = http.createServer();
         this.socket = socketio(this.http);
