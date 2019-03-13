@@ -109,7 +109,7 @@ var Server = function () {
 
         this.ip = options.ip;
         this.port = options.port;
-        this.assetDir = options.assetDir;
+        this.assetDir = options.assetsDir;
 
         this.assets = new Assets(this.assetDir);
         this.http = http.createServer();
