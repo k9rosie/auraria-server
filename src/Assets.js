@@ -6,10 +6,10 @@ import Tilesheet from "./Tilesheet";
 export default class Assets {
     constructor(assetsDir) {
         this.dirs = {
-            maps: path.join(assetsDir, 'maps/'),
+            maps: path.join(assetsDir, '/maps'),
             tilesheets: {
-                img: path.join(assetsDir, 'tilesheets/img'),
-                json: fs.readdirSync(assetsDir + 'tilesheets/json')
+                img: path.join(assetsDir, '/tilesheets/img'),
+                json: fs.readdirSync(assetsDir + '/tilesheets/json')
             }
         };
         this.maps = {};
