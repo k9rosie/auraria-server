@@ -21,6 +21,8 @@
   },
   "dependencies": {
     "auraria-ecs": "github:k9rosie/auraria-ecs#master",
+    "jsdoc": "^3.5.5",
+    "pako": "^1.0.10",
     "socket.io": "^2.2.0"
   }
 }

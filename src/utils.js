@@ -1,3 +1,7 @@
-export const truncateFileExtension = (fileName) => {
-    return fileName.replace(/\.[^/.]+$/, "");
+const Utils = {
+    truncateFileExtension: (fileName) => {
+        return fileName.replace(/\.[^/.]+$/, "");
+    }
 };
+
+export default Utils;

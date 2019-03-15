@@ -1,8 +1,13 @@
 import fs from 'fs';
 import path from 'path';
-import {truncateFileExtension} from './utils';
+import Utils from './utils';
 import Tilesheet from "./Tilesheet";
 
+/**
+ * Centralized object where map and tilesheet assets are stored.
+ * @constructor
+ * @param {string} - The full complete path to the assets directory
+ */
 export default class Assets {
     constructor(assetsDir) {
         this.dirs = {
@@ -16,6 +21,17 @@ export default class Assets {
         this.tilesheets = {};
     }
 
+    /**
+     * Loads map and tilesheet files in one function
+     */
+    load() {
+        this.loadMaps();
+        this.loadTilesheets();
+    }
+
+    /**
+     * Loads all map files in one function
+     */
     loadMaps() {
         fs.readdirSync(this.dirs.maps).forEach(fileName => {
             let p = path.join(this.dirs.maps, fileName);
@@ -23,6 +39,12 @@ export default class Assets {
         });
     }
 
+    /**
+     * Read a map
+     * @static
+     * @param {string} mapPath - The full path to the map file
+     * @returns {object} - Parsed JS object from the map JSON
+     */
     static map(mapPath) {
         let buf = fs.readFileSync(mapPath);
         return JSON.parse(
@@ -30,9 +52,12 @@ export default class Assets {
         );
     }
 
+    /**
+     * Loads all tilesheet files in one function.
+     */
     loadTilesheets() {
         fs.readdirSync(this.dirs.tilesheets.img).forEach(fileName => {
-            let base = truncateFileExtension(fileName);
+            let base = Utils.truncateFileExtension(fileName);
             let pathImg = path.join(this.dirs.tilesheets.img, fileName);
             let pathJSON = path.join(this.dirs.tilesheets.json, base+'.json');
             this.tilesheets[base] = new Tilesheet(
@@ -42,11 +67,23 @@ export default class Assets {
         });
     }
 
+    /**
+     * Reads tilesheet image data and returns base64 encoded image
+     * @static
+     * @param {string} tilesheetPath - The full path to the tilesheet image
+     * @returns {string} - The base64 encoded image
+     */
     static tilesheet(tilesheetPath) {
         let buf = fs.readFileSync(tilesheetPath);
         return buf.toString('base64');
     }
 
+    /**
+     * Parses tilesheet JSON data and returns a JS object
+     * @static
+     * @param {string} tilesheetDataPath - The full path to the tilesheet JSON file
+     * @returns {object} - The parsed JSON file
+     */
     static tilesheetData(tilesheetDataPath) {
         let buf = fs.readFileSync(tilesheetDataPath);
         return JSON.parse(
