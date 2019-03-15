@@ -5,9 +5,11 @@ import Utils from './utils';
 import Instance from './Instance';
 import * as Ticker from './ticker/index';
 
-export default Server;
-export default Assets;
-export default Tilesheet;
-export default Utils;
-export default Instance;
-export default Ticker;
+export default {
+    Server,
+    Assets,
+    Tilesheet,
+    Utils,
+    Instance,
+    Ticker,
+}
