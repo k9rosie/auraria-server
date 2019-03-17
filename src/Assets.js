@@ -57,10 +57,11 @@ export default class Assets {
      */
     loadTilesheets() {
         fs.readdirSync(this.dirs.tilesheets.img).forEach(fileName => {
-            let base = Utils.truncateFileExtension(fileName);
+            let name = Utils.truncateFileExtension(fileName);
             let pathImg = path.join(this.dirs.tilesheets.img, fileName);
-            let pathJSON = path.join(this.dirs.tilesheets.json, base+'.json');
-            this.tilesheets[base] = new Tilesheet(
+            let pathJSON = path.join(this.dirs.tilesheets.json, name+'.json');
+            this.tilesheets[name] = new Tilesheet(
+                name,
                 Assets.tilesheet(pathImg),
                 Assets.tilesheetData(pathJSON)
             );

@@ -7,7 +7,8 @@ import pako from 'pako';
  * @param {object} data - The tilesheet data
  */
 export default class Tilesheet {
-    constructor(img, data) {
+    constructor(name, img, data) {
+        this.name = name;
         this.img = img; // image data in uncompressed base64 format
         this.data = data;
     }
