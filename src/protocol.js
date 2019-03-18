@@ -17,3 +17,5 @@ const protocol = {
         })
     }
 }
+
+export default protocol;

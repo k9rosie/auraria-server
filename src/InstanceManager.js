@@ -11,6 +11,7 @@ export default class InstanceManager {
     
     newInstance(map, world, tickrate = 20) {
         let instance = new Instance(map, world, tickrate);
+        instance.room = this.server.socket.to(instance.id);
         this.instances[instance.id] = instance;
         return instance.id;
     }
