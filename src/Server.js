@@ -1,5 +1,6 @@
 import {createServer} from "http";
 import socketio from "socket.io";
+import InstanceManager from './InstanceManager';
 
 /**
  * Centralized class for all server actions and events
@@ -11,6 +12,7 @@ export default class Server {
         let options = {
             ip: '127.0.0.1',
             port: 8080,
+            instanceManager: true,
             socketOpts: {},
             httpOpts: {},
             ...opts
@@ -20,7 +22,7 @@ export default class Server {
         this.port = options.port;
         this.socketOpts = options.socketOpts;
         this.httpOpts = options.httpOpts;
-
+        this.instanceManager = options.instanceManager ? new InstanceManager() : undefined;
         this.http = createServer(this.httpOpts);
         this.socket = socketio(this.http, this.socketOpts);
     }
