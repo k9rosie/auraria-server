@@ -1,5 +1,4 @@
 import uuidv4 from 'uuid';
-import loki from 'lokijs';
 import { createServer } from 'http';
 import socketio from 'socket.io';
 import pako from 'pako';
@@ -702,30 +701,6 @@ var Ticker = function () {
     return Ticker;
 }();
 
-var Instance = function () {
-    function Instance(map, ecsWorld) {
-        var tickrate = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 20;
-        classCallCheck(this, Instance);
-
-        this.id = uuidv4();
-        this.map = map;
-        this.tickrate = tickrate;
-        this.ecsWorld = ecsWorld;
-        this.ticker = new Ticker(this.tickrate);
-        this.ticker.add(this.ecsWorld.tick, this.ecsWorld);
-        this.connectedSockets = [];
-    }
-
-    Instance.prototype.start = function start() {
-        var prestart = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : function () {};
-
-        prestart.bind(this).call();
-        this.ticker.start();
-    };
-
-    return Instance;
-}();
-
 var Protocol = {
     join: function join(socket, map, entities) {
         socket.emit('join', {
@@ -747,6 +722,35 @@ var Protocol = {
     }
 };
 
+var Instance = function () {
+    function Instance(map, ecsWorld) {
+        var tickrate = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 20;
+        classCallCheck(this, Instance);
+
+        this.id = uuidv4();
+        this.map = map;
+        this.tickrate = tickrate;
+        this.ecsWorld = ecsWorld;
+        this.ticker = new Ticker(this.tickrate);
+        this.room = {}; // this is set in an InstanceManager newInstance call
+    }
+
+    Instance.prototype.start = function start() {
+        var prestart = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : function () {};
+
+        prestart.call(this);
+
+        this.ticker.add(this.ecsWorld.tick, this.ecsWorld);
+
+        // add function to broadcast update packets every tick
+        this.ticker.add(Protocol.update(this.room, this.ecsWorld.changes));
+
+        this.ticker.start();
+    };
+
+    return Instance;
+}();
+
 /**
  * A helper class to manage instances
  */
@@ -757,7 +761,7 @@ var InstanceManager = function () {
 
         this.server = server;
         this.instances = {};
-        this.connectedSockets = new loki('sockets');
+        this.connectedSockets = {}; // socket id => room (instance) id
     }
 
     InstanceManager.prototype.newInstance = function newInstance(map, world) {
@@ -777,7 +781,14 @@ var InstanceManager = function () {
 
     InstanceManager.prototype.joinInstance = function joinInstance(socket, instanceId) {
         var instance = this.instances[instanceId];
+
+        if (this.connectedSockets.hasOwnProperty(socket.id)) // if they are switching instances
+            socket.leave(this.connectedSockets[socket.id]);
+
+        socket.join(instance.id);
         socket.emit(Protocol.map(socket, instance.map));
+        socket.emit(Protocol.join(socket, instance.world.serializeEntities()));
+        this.connectedSockets[socket.id] = instance.id;
     };
 
     return InstanceManager;
@@ -817,7 +828,7 @@ var Server = function () {
 
     Server.prototype.listen = function listen() {
         this.http.listen(this.port, this.ip);
-        console.log("listening on " + this.ip + ":" + this.port);
+        console.log("listening on " + this.ip + ":" + this.port + "\n");
     };
 
     /**
@@ -899,8 +910,8 @@ var Assets = function () {
                 json: path.join(assetsDir, '/tilesheets/json')
             }
         };
-        this.maps = {};
-        this.tilesheets = {};
+        this.maps = {}; // map file name => map data
+        this.tilesheets = {}; // tilesheet name (sans extension) => Tilesheet (class)
     }
 
     /**
@@ -1014,6 +1025,7 @@ var CommandHandler = function () {
                 _this.commands[split[0]].execute(split.splice(0, 1));
                 _this.startReading();
             } else if (split[0] === "exit") {
+                console.log('Bye!\n');
                 process.exit(0);
             } else {
                 console.error('Command ' + split[0] + ' doesn\'t exist');
