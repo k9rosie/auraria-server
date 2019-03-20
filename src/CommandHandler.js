@@ -14,8 +14,12 @@ export default class CommandHandler {
             let split = command.split(" ");
             if (this.commands.hasOwnProperty(command)) {
                 this.commands[split[0]].execute(split.splice(0, 1));
+                this.startReading();
+            } else if (split[0] === "exit") {
+                process.exit(0);
             } else {
                 console.error(`Command ${split[0]} doesn't exist`);
+                this.startReading();
             }
         });
     }
