@@ -1,5 +1,6 @@
 import Instance from './Instance';
 import Protocol from './protocol';
+import loki from 'lokijs';
 
 /**
  * A helper class to manage instances

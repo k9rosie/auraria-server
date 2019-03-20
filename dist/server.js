@@ -3,6 +3,7 @@
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
 var uuidv4 = _interopDefault(require('uuid'));
+var loki = _interopDefault(require('lokijs'));
 var http = require('http');
 var socketio = _interopDefault(require('socket.io'));
 var pako = _interopDefault(require('pako'));
