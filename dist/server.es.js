@@ -1019,9 +1019,9 @@ var CommandHandler = function () {
     CommandHandler.prototype.startReading = function startReading() {
         var _this = this;
 
-        this.interface.question('Command: ', function (command) {
+        this.interface.question('\n-> ', function (command) {
             var split = command.split(" ");
-            if (_this.commands.hasOwnProperty(command)) {
+            if (_this.commands.hasOwnProperty(split[0])) {
                 _this.commands[split[0]].execute(split.splice(0, 1));
                 _this.startReading();
             } else if (split[0] === "exit") {

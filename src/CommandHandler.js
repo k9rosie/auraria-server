@@ -10,9 +10,9 @@ export default class CommandHandler {
     }
 
     startReading() {
-        this.interface.question('Command: ', (command) => {
+        this.interface.question('\n-> ', (command) => {
             let split = command.split(" ");
-            if (this.commands.hasOwnProperty(command)) {
+            if (this.commands.hasOwnProperty(split[0])) {
                 this.commands[split[0]].execute(split.splice(0, 1));
                 this.startReading();
             } else if (split[0] === "exit") {
