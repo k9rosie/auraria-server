@@ -1008,7 +1008,7 @@ var CommandHandler = function () {
     CommandHandler.prototype.startReading = function startReading() {
         var _this = this;
 
-        this.interface.question('Command:', function (command) {
+        this.interface.question('Command: ', function (command) {
             var split = command.split(" ");
             if (_this.commands.hasOwnProperty(command)) {
                 _this.commands[split[0]].execute(split.splice(0, 1));
