@@ -1,8 +1,10 @@
+import uuidv4 from 'uuid';
 import { createServer } from 'http';
 import socketio from 'socket.io';
 import pako from 'pako';
 import fs from 'fs';
 import path from 'path';
+import { createInterface } from 'readline';
 
 var classCallCheck = function (instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -41,206 +43,6 @@ var _extends = Object.assign || function (target) {
 
   return target;
 };
-
-/**
- * Centralized class for all server actions and events
- * @constructor
- * @params {object} opts - Server options
- */
-
-var Server = function () {
-    function Server(opts) {
-        classCallCheck(this, Server);
-
-        var options = _extends({
-            ip: '127.0.0.1',
-            port: 8080,
-            socketOpts: {},
-            httpOpts: {}
-        }, opts);
-
-        this.ip = options.ip;
-        this.port = options.port;
-        this.socketOpts = options.socketOpts;
-        this.httpOpts = options.httpOpts;
-
-        this.http = createServer(this.httpOpts);
-        this.socket = socketio(this.http, this.socketOpts);
-    }
-
-    /**
-     * Bind HTTP server to port and IP address and start listening for connections
-     */
-
-
-    Server.prototype.listen = function listen() {
-        this.http.listen(this.port, this.ip);
-        console.log("listening on " + this.ip + ":" + this.port);
-    };
-
-    /**
-     * Shorthand for calling socket.on
-     * @param event {string} - The name of the event
-     * @param callback {function} - The event callback
-     */
-
-
-    Server.prototype.on = function on(event, callback) {
-        this.socket.on(event, callback);
-    };
-
-    /**
-     * Shorthand for calling socket.emit. This will emit the event to every connected socket.
-     * @param event {string} - The name of the event
-     */
-
-
-    Server.prototype.emit = function emit(event) {
-        this.socket.emit(event);
-    };
-
-    return Server;
-}();
-
-var Utils = {
-    truncateFileExtension: function truncateFileExtension(fileName) {
-        return fileName.replace(/\.[^/.]+$/, "");
-    }
-};
-
-/**
- * Represents a tilesheet. Includes image data in uncompressed base64 and the JSON data associated with it
- * @constructor
- * @param {string} img - The image data encoded in base64
- * @param {object} data - The tilesheet data
- */
-
-var Tilesheet = function () {
-    function Tilesheet(img, data) {
-        classCallCheck(this, Tilesheet);
-
-        this.img = img; // image data in uncompressed base64 format
-        this.data = data;
-    }
-
-    /**
-     * Serializes this object into JSON then compresses it with pako (zlib)
-     * and returns the base64 encoded string.
-     * @returns {string} - Returns compressed JSON encoded in base64
-     */
-
-
-    Tilesheet.prototype.package = function _package() {
-        var serialized = JSON.stringify(this);
-        var compressed = pako.deflate(serialized, { to: 'string' });
-        return Buffer.from(compressed).toString('base64');
-    };
-
-    return Tilesheet;
-}();
-
-/**
- * Centralized object where map and tilesheet assets are stored.
- * @constructor
- * @param {string} - The full complete path to the assets directory
- */
-
-var Assets = function () {
-    function Assets(assetsDir) {
-        classCallCheck(this, Assets);
-
-        this.dirs = {
-            maps: path.join(assetsDir, '/maps'),
-            tilesheets: {
-                img: path.join(assetsDir, '/tilesheets/img'),
-                json: path.join(assetsDir, '/tilesheets/json')
-            }
-        };
-        this.maps = {};
-        this.tilesheets = {};
-    }
-
-    /**
-     * Loads map and tilesheet files in one function
-     */
-
-
-    Assets.prototype.load = function load() {
-        this.loadMaps();
-        this.loadTilesheets();
-    };
-
-    /**
-     * Loads all map files in one function
-     */
-
-
-    Assets.prototype.loadMaps = function loadMaps() {
-        var _this = this;
-
-        fs.readdirSync(this.dirs.maps).forEach(function (fileName) {
-            var p = path.join(_this.dirs.maps, fileName);
-            _this.maps[fileName] = Assets.map(p);
-        });
-    };
-
-    /**
-     * Read a map
-     * @static
-     * @param {string} mapPath - The full path to the map file
-     * @returns {object} - Parsed JS object from the map JSON
-     */
-
-
-    Assets.map = function map(mapPath) {
-        var buf = fs.readFileSync(mapPath);
-        return JSON.parse(buf.toString('utf-8'));
-    };
-
-    /**
-     * Loads all tilesheet files in one function.
-     */
-
-
-    Assets.prototype.loadTilesheets = function loadTilesheets() {
-        var _this2 = this;
-
-        fs.readdirSync(this.dirs.tilesheets.img).forEach(function (fileName) {
-            var base = Utils.truncateFileExtension(fileName);
-            var pathImg = path.join(_this2.dirs.tilesheets.img, fileName);
-            var pathJSON = path.join(_this2.dirs.tilesheets.json, base + '.json');
-            _this2.tilesheets[base] = new Tilesheet(Assets.tilesheet(pathImg), Assets.tilesheetData(pathJSON));
-        });
-    };
-
-    /**
-     * Reads tilesheet image data and returns base64 encoded image
-     * @static
-     * @param {string} tilesheetPath - The full path to the tilesheet image
-     * @returns {string} - The base64 encoded image
-     */
-
-
-    Assets.tilesheet = function tilesheet(tilesheetPath) {
-        var buf = fs.readFileSync(tilesheetPath);
-        return buf.toString('base64');
-    };
-
-    /**
-     * Parses tilesheet JSON data and returns a JS object
-     * @static
-     * @param {string} tilesheetDataPath - The full path to the tilesheet JSON file
-     * @returns {object} - The parsed JSON file
-     */
-
-
-    Assets.tilesheetData = function tilesheetData(tilesheetDataPath) {
-        var buf = fs.readFileSync(tilesheetDataPath);
-        return JSON.parse(buf.toString('utf-8'));
-    };
-
-    return Assets;
-}();
 
 /*
     this code is literally just stolen from the Pixi.js ticker library because im a lazy asshole
@@ -900,16 +702,17 @@ var Ticker = function () {
 }();
 
 var Instance = function () {
-    function Instance(namespace, map, ecsWorld) {
-        var tickrate = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 20;
+    function Instance(map, ecsWorld) {
+        var tickrate = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 20;
         classCallCheck(this, Instance);
 
-        this.namespace = namespace;
+        this.id = uuidv4();
         this.map = map;
         this.tickrate = tickrate;
         this.ecsWorld = ecsWorld;
         this.ticker = new Ticker(this.tickrate);
         this.ticker.add(this.ecsWorld.tick, this.ecsWorld);
+        this.connectedSockets = [];
     }
 
     Instance.prototype.start = function start() {
@@ -919,15 +722,266 @@ var Instance = function () {
         this.ticker.start();
     };
 
-    Instance.prototype.on = function on(event, callback) {
-        this.namespace.on(event, callback);
-    };
-
-    Instance.prototype.emit = function emit(event) {
-        this.namespace.emit(event);
-    };
-
     return Instance;
+}();
+
+var Protocol = {
+    join: function join(socket, map, entities) {
+        socket.emit('join', {
+            map: map,
+            entities: entities
+        });
+    },
+
+    update: function update(socket, changes) {
+        socket.emit('update', {
+            changes: changes
+        });
+    },
+
+    tilesheet: function tilesheet(socket, _tilesheet) {
+        socket.emit('tilesheet', {
+            data: _tilesheet
+        });
+    }
+};
+
+/**
+ * A helper class to manage instances
+ */
+
+var InstanceManager = function () {
+    function InstanceManager(server) {
+        classCallCheck(this, InstanceManager);
+
+        this.server = server;
+        this.instances = {};
+        this.connectedSockets = new loki('sockets');
+    }
+
+    InstanceManager.prototype.newInstance = function newInstance(map, world) {
+        var tickrate = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 20;
+
+        var instance = new Instance(map, world, tickrate);
+        instance.room = this.server.socket.to(instance.id);
+        this.instances[instance.id] = instance;
+        return instance.id;
+    };
+
+    InstanceManager.prototype.startInstances = function startInstances() {
+        Object.values(this.instances).forEach(function (instance) {
+            instance.start();
+        });
+    };
+
+    InstanceManager.prototype.joinInstance = function joinInstance(socket, instanceId) {
+        var instance = this.instances[instanceId];
+        socket.emit(Protocol.map(socket, instance.map));
+    };
+
+    return InstanceManager;
+}();
+
+/**
+ * Centralized class for all server actions and events
+ * @constructor
+ * @params {object} opts - Server options
+ */
+
+var Server = function () {
+    function Server(opts) {
+        classCallCheck(this, Server);
+
+        var options = _extends({
+            ip: '127.0.0.1',
+            port: 8080,
+            instanceManager: true,
+            socketOpts: {},
+            httpOpts: {}
+        }, opts);
+
+        this.ip = options.ip;
+        this.port = options.port;
+        this.socketOpts = options.socketOpts;
+        this.httpOpts = options.httpOpts;
+        this.instanceManager = options.instanceManager ? new InstanceManager() : undefined;
+        this.http = createServer(this.httpOpts);
+        this.socket = socketio(this.http, this.socketOpts);
+    }
+
+    /**
+     * Bind HTTP server to port and IP address and start listening for connections
+     */
+
+
+    Server.prototype.listen = function listen() {
+        this.http.listen(this.port, this.ip);
+        console.log("listening on " + this.ip + ":" + this.port);
+    };
+
+    /**
+     * Shorthand for calling socket.on
+     * @param event {string} - The name of the event
+     * @param callback {function} - The event callback
+     */
+
+
+    Server.prototype.on = function on(event, callback) {
+        this.socket.on(event, callback);
+    };
+
+    /**
+     * Shorthand for calling socket.emit. This will emit the event to every connected socket.
+     * @param event {string} - The name of the event
+     */
+
+
+    Server.prototype.emit = function emit(event) {
+        this.socket.emit(event);
+    };
+
+    return Server;
+}();
+
+var Utils = {
+    truncateFileExtension: function truncateFileExtension(fileName) {
+        return fileName.replace(/\.[^/.]+$/, "");
+    }
+};
+
+/**
+ * Represents a tilesheet. Includes image data in uncompressed base64 and the JSON data associated with it
+ * @constructor
+ * @param {string} img - The image data encoded in base64
+ * @param {object} data - The tilesheet data
+ */
+
+var Tilesheet = function () {
+    function Tilesheet(name, img, data) {
+        classCallCheck(this, Tilesheet);
+
+        this.name = name;
+        this.img = img; // image data in uncompressed base64 format
+        this.data = data;
+    }
+
+    /**
+     * Serializes this object into JSON then compresses it with pako (zlib)
+     * and returns the base64 encoded string.
+     * @returns {string} - Returns compressed JSON encoded in base64
+     */
+
+
+    Tilesheet.prototype.package = function _package() {
+        var serialized = JSON.stringify(this);
+        var compressed = pako.deflate(serialized, { to: 'string' });
+        return Buffer.from(compressed).toString('base64');
+    };
+
+    return Tilesheet;
+}();
+
+/**
+ * Centralized object where map and tilesheet assets are stored.
+ * @constructor
+ * @param {string} - The full complete path to the assets directory
+ */
+
+var Assets = function () {
+    function Assets(assetsDir) {
+        classCallCheck(this, Assets);
+
+        this.dirs = {
+            maps: path.join(assetsDir, '/maps'),
+            tilesheets: {
+                img: path.join(assetsDir, '/tilesheets/img'),
+                json: path.join(assetsDir, '/tilesheets/json')
+            }
+        };
+        this.maps = {};
+        this.tilesheets = {};
+    }
+
+    /**
+     * Loads map and tilesheet files in one function
+     */
+
+
+    Assets.prototype.load = function load() {
+        this.loadMaps();
+        this.loadTilesheets();
+    };
+
+    /**
+     * Loads all map files in one function
+     */
+
+
+    Assets.prototype.loadMaps = function loadMaps() {
+        var _this = this;
+
+        fs.readdirSync(this.dirs.maps).forEach(function (fileName) {
+            var p = path.join(_this.dirs.maps, fileName);
+            _this.maps[fileName] = Assets.map(p);
+        });
+    };
+
+    /**
+     * Read a map
+     * @static
+     * @param {string} mapPath - The full path to the map file
+     * @returns {object} - Parsed JS object from the map JSON
+     */
+
+
+    Assets.map = function map(mapPath) {
+        var buf = fs.readFileSync(mapPath);
+        return JSON.parse(buf.toString('utf-8'));
+    };
+
+    /**
+     * Loads all tilesheet files in one function.
+     */
+
+
+    Assets.prototype.loadTilesheets = function loadTilesheets() {
+        var _this2 = this;
+
+        fs.readdirSync(this.dirs.tilesheets.img).forEach(function (fileName) {
+            var name = Utils.truncateFileExtension(fileName);
+            var pathImg = path.join(_this2.dirs.tilesheets.img, fileName);
+            var pathJSON = path.join(_this2.dirs.tilesheets.json, name + '.json');
+            _this2.tilesheets[name] = new Tilesheet(name, Assets.tilesheet(pathImg), Assets.tilesheetData(pathJSON));
+        });
+    };
+
+    /**
+     * Reads tilesheet image data and returns base64 encoded image
+     * @static
+     * @param {string} tilesheetPath - The full path to the tilesheet image
+     * @returns {string} - The base64 encoded image
+     */
+
+
+    Assets.tilesheet = function tilesheet(tilesheetPath) {
+        var buf = fs.readFileSync(tilesheetPath);
+        return buf.toString('base64');
+    };
+
+    /**
+     * Parses tilesheet JSON data and returns a JS object
+     * @static
+     * @param {string} tilesheetDataPath - The full path to the tilesheet JSON file
+     * @returns {object} - The parsed JSON file
+     */
+
+
+    Assets.tilesheetData = function tilesheetData(tilesheetDataPath) {
+        var buf = fs.readFileSync(tilesheetDataPath);
+        return JSON.parse(buf.toString('utf-8'));
+    };
+
+    return Assets;
 }();
 
 var index = {
@@ -939,13 +993,59 @@ var Ticker$1 = /*#__PURE__*/Object.freeze({
   default: index
 });
 
+var CommandHandler = function () {
+    function CommandHandler() {
+        classCallCheck(this, CommandHandler);
+
+        this.interface = createInterface({
+            input: process.stdin,
+            output: process.stdout
+        });
+        this.commands = {};
+    }
+
+    CommandHandler.prototype.startReading = function startReading() {
+        var _this = this;
+
+        this.interface('Command:', function (command) {
+            var split = command.split(" ");
+            if (_this.commands.hasOwnProperty(command)) {
+                _this.commands[split[0]].execute(split.splice(0, 1));
+            } else {
+                console.error('Command ' + split[0] + ' doesn\'t exist');
+            }
+        });
+    };
+
+    return CommandHandler;
+}();
+
+var Command = function () {
+    function Command(command, fn, context) {
+        classCallCheck(this, Command);
+
+        this.fn = fn;
+        this.context = context;
+    }
+
+    Command.prototype.execute = function execute(args) {
+        this.fn.call(this.context, args);
+    };
+
+    return Command;
+}();
+
 var index$1 = {
     Server: Server,
     Assets: Assets,
     Tilesheet: Tilesheet,
     Utils: Utils,
     Instance: Instance,
-    Ticker: Ticker$1
+    Ticker: Ticker$1,
+    InstanceManager: InstanceManager,
+    Protocol: Protocol,
+    CommandHandler: CommandHandler,
+    Command: Command
 };
 
 export default index$1;
