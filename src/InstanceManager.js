@@ -1,4 +1,5 @@
 import Instance from './Instance';
+import Protocol from './protocol';
 
 /**
  * A helper class to manage instances
@@ -7,6 +8,7 @@ export default class InstanceManager {
     constructor(server) {
         this.server = server;
         this.instances = {};
+        this.connectedSockets = new loki('sockets');
     }
     
     newInstance(map, world, tickrate = 20) {
@@ -20,5 +22,10 @@ export default class InstanceManager {
         Object.values(this.instances).forEach(instance => {
             instance.start();
         });
+    }
+
+    joinInstance(socket, instanceId) {
+        let instance = this.instances[instanceId];
+        socket.emit(Protocol.map(socket, instance.map));
     }
 }

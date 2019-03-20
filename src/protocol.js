@@ -1,7 +1,8 @@
-const protocol = {
-    map: (socket, map) => {
-        socket.emit('map', {
-            mapData: map
+const Protocol = {
+    join: (socket, map, entities) => {
+        socket.emit('join', {
+            map: map,
+            entities: entities
         })
     },
 
@@ -18,4 +19,4 @@ const protocol = {
     }
 }
 
-export default protocol;
+export default Protocol;

@@ -51,8 +51,4 @@ export default class Server {
     emit(event) {
         this.socket.emit(event);
     }
-    
-    joinInstance(socket, instance) {
-        
-    }
 }
