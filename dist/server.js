@@ -1026,7 +1026,7 @@ var CommandHandler = function () {
         this.interface.question('\n-> ', function (command) {
             var split = command.split(" ");
             if (_this.commands.hasOwnProperty(split[0])) {
-                _this.commands[split[0]].execute.call(_this.commands[split[0]].context, split);
+                _this.commands[split[0]].execute(split);
                 _this.startReading();
             } else if (split[0] === "exit") {
                 console.log('Bye!\n');

@@ -13,7 +13,7 @@ export default class CommandHandler {
         this.interface.question('\n-> ', (command) => {
             let split = command.split(" ");
             if (this.commands.hasOwnProperty(split[0])) {
-                this.commands[split[0]].execute.call(this.commands[split[0]].context, split);
+                this.commands[split[0]].execute(split);
                 this.startReading();
             } else if (split[0] === "exit") {
                 console.log('Bye!\n');
