@@ -1026,7 +1026,7 @@ var CommandHandler = function () {
         this.interface.question('\n-> ', function (command) {
             var split = command.split(" ");
             if (_this.commands.hasOwnProperty(split[0])) {
-                _this.commands[split[0]].execute(split);
+                _this.commands[split[0]].fn(split);
                 _this.startReading();
             } else if (split[0] === "exit") {
                 console.log('Bye!\n');
@@ -1041,20 +1041,11 @@ var CommandHandler = function () {
     return CommandHandler;
 }();
 
-var Command = function () {
-    function Command(command, fn, context) {
-        classCallCheck(this, Command);
+var Command = function Command(fn, context) {
+    classCallCheck(this, Command);
 
-        this.fn = fn;
-        this.context = context;
-    }
-
-    Command.prototype.execute = function execute(args) {
-        this.fn.call(this.context, args);
-    };
-
-    return Command;
-}();
+    this.fn = fn.bind(context);
+};
 
 var index$1 = {
     Server: Server,
