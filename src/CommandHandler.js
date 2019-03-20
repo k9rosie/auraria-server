@@ -16,6 +16,7 @@ export default class CommandHandler {
                 this.commands[split[0]].execute(split.splice(0, 1));
                 this.startReading();
             } else if (split[0] === "exit") {
+                console.log('Bye!\n');
                 process.exit(0);
             } else {
                 console.error(`Command ${split[0]} doesn't exist`);

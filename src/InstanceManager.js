@@ -1,6 +1,5 @@
 import Instance from './Instance';
 import Protocol from './protocol';
-import loki from 'lokijs';
 
 /**
  * A helper class to manage instances
@@ -9,7 +8,7 @@ export default class InstanceManager {
     constructor(server) {
         this.server = server;
         this.instances = {};
-        this.connectedSockets = new loki('sockets');
+        this.connectedSockets = {}; // socket id => room (instance) id
     }
     
     newInstance(map, world, tickrate = 20) {
@@ -27,6 +26,13 @@ export default class InstanceManager {
 
     joinInstance(socket, instanceId) {
         let instance = this.instances[instanceId];
+
+        if (this.connectedSockets.hasOwnProperty(socket.id)) // if they are switching instances
+            socket.leave(this.connectedSockets[socket.id]);
+
+        socket.join(instance.id);
         socket.emit(Protocol.map(socket, instance.map));
+        socket.emit(Protocol.join(socket, instance.world.serializeEntities()));
+        this.connectedSockets[socket.id] = instance.id;
     }
 }

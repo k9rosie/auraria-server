@@ -17,8 +17,8 @@ export default class Assets {
                 json: path.join(assetsDir, '/tilesheets/json')
             }
         };
-        this.maps = {};
-        this.tilesheets = {};
+        this.maps = {}; // map file name => map data
+        this.tilesheets = {}; // tilesheet name (sans extension) => Tilesheet (class)
     }
 
     /**

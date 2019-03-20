@@ -32,7 +32,7 @@ export default class Server {
      */
     listen() {
         this.http.listen(this.port, this.ip);
-        console.log(`listening on ${this.ip}:${this.port}`);
+        console.log(`listening on ${this.ip}:${this.port}\n`);
     }
 
     /**
