@@ -1022,7 +1022,7 @@ var CommandHandler = function () {
         this.interface.question('\n-> ', function (command) {
             var split = command.split(" ");
             if (_this.commands.hasOwnProperty(split[0])) {
-                _this.commands[split[0]].fn(split);
+                _this.commands[split[0]].fn.call(_this.commands[split[0]].context);
                 _this.startReading();
             } else if (split[0] === "exit") {
                 console.log('Bye!\n');
@@ -1040,7 +1040,8 @@ var CommandHandler = function () {
 var Command = function Command(fn, context) {
     classCallCheck(this, Command);
 
-    this.fn = fn.bind(context);
+    this.fn = fn;
+    this.context = context;
 };
 
 var index$1 = {
