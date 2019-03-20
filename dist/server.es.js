@@ -1022,13 +1022,13 @@ var CommandHandler = function () {
         this.interface.question('\n-> ', function (command) {
             var split = command.split(" ");
             if (_this.commands.hasOwnProperty(split[0])) {
-                _this.commands[split[0]].execute(split.splice(0, 1));
+                _this.commands[split[0]].execute(split);
                 _this.startReading();
             } else if (split[0] === "exit") {
                 console.log('Bye!\n');
                 process.exit(0);
             } else {
-                console.error('Command ' + split[0] + ' doesn\'t exist');
+                console.error('Root command ' + split[0] + ' doesn\'t exist');
                 _this.startReading();
             }
         });

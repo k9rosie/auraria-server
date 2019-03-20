@@ -13,13 +13,13 @@ export default class CommandHandler {
         this.interface.question('\n-> ', (command) => {
             let split = command.split(" ");
             if (this.commands.hasOwnProperty(split[0])) {
-                this.commands[split[0]].execute(split.splice(0, 1));
+                this.commands[split[0]].execute(split);
                 this.startReading();
             } else if (split[0] === "exit") {
                 console.log('Bye!\n');
                 process.exit(0);
             } else {
-                console.error(`Command ${split[0]} doesn't exist`);
+                console.error(`Root command ${split[0]} doesn't exist`);
                 this.startReading();
             }
         });
